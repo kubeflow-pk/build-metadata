@@ -1,0 +1,22 @@
+dist: metadata
+
+env:
+  global:
+    - IMAGE_NAME=pkskubeflow/metadata:v0.1.11
+    - CODE_TAG=master
+    
+arch:
+#  - amd64
+  - arm64
+
+services:
+  - docker
+
+before_install:
+  - git clone -b ${CODE_TAG} --depth 1 https://github.com/kubeflow/metadata.git
+
+script:
+  - cd application
+  - docker build -t ${IMAGE_NAME} -f Dockerfile .
+  - docker login -u ${DOCKER_USER} -p ${DOCKER_PWD}
+  - docker push ${IMAGE_NAME}
