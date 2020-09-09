@@ -18,6 +18,6 @@ script:
   - rm metadata/Dockerfile
   - cp build-metadata/Dockerfile metadata/
   - cd metadata
-  - docker build -t ${IMAGE_NAME} -f frontend/Dockerfile .
+  - docker build -t ${IMAGE_NAME} -f Dockerfile .
   - docker login -u ${DOCKER_USER} -p ${DOCKER_PWD}
   - docker push ${IMAGE_NAME}
