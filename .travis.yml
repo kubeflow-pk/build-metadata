@@ -13,10 +13,11 @@ services:
 
 before_install:
   - git clone -b ${CODE_TAG} --depth 1 https://github.com/kubeflow/metadata.git
+  - git clone  --depth 1 https://github.com/kubeflow-pk/build-metadata.git
 
 script:
   - rm metadata/Dockerfile
-  - cp kubeflow-pk/build-metadata/Dockerfile metadata/
+  - cp build-metadata/Dockerfile metadata/
   - cd metadata
   - docker build -t ${IMAGE_NAME} -f Dockerfile .
   - docker login -u ${DOCKER_USER} -p ${DOCKER_PWD}
