@@ -16,7 +16,7 @@ before_install:
 
 script:
   - rm metadata/Dockerfile
-  - cp build-metadata/Dockerfile metadata/
+  - cp kubeflow-pk/build-metadata/Dockerfile metadata/
   - cd metadata
   - docker build -t ${IMAGE_NAME} -f Dockerfile .
   - docker login -u ${DOCKER_USER} -p ${DOCKER_PWD}
