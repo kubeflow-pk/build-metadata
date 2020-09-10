@@ -27,9 +27,8 @@ before_install:
   - docker buildx create --use
   - docker buildx inspect --bootstrap
   - git clone -b ${CODE_TAG} --depth 1 https://github.com/kubeflow/metadata.git
-#  - git clone  --depth 1 https://github.com/kubeflow-pk/build-metadata.git
 
 script:
   - cp Dockerfile.multiarch metadata/Dockerfile
   - cd metadata
-  - docker buildx build --push --platform linux/amd64,linux/arm64 -t ${IMAGE_TAG} -f Dockerfile .
+  - docker buildx build --push --platform linux/amd64 -t ${IMAGE_TAG} -f Dockerfile .
