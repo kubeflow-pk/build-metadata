@@ -14,9 +14,8 @@ RUN if [ "$(uname -m)" = "aarch64" ]; then export ARCH=arm64; else export ARCH=x
     cd /tmp && \
     wget -O /tmp/bazel https://github.com/bazelbuild/bazel/releases/download/3.5.0/bazel-3.5.0-linux-${ARCH} && \
     chmod +x bazel && \
-    cp bazel /usr/local/bin/ && \
-    bazel -v
-
+    cp bazel /usr/local/bin/
+    
 ENV GO111MODULE on
 
 WORKDIR /go/src/github.com/kubeflow/metadata
