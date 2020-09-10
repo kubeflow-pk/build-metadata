@@ -1,0 +1,23 @@
+FROM golang:1.12 AS builder
+
+ARG EXTRA_BAZEL_ARGS
+
+RUN apt-get update && apt-get -y install cmake unzip patch wget && apt-get clean
+
+RUN cd /tmp && \
+    wget -O /tmp/bazel https://github.com/bazelbuild/bazel/releases/download/3.5.0/bazel-3.5.0-linux-$(uname -m) && \
+    chmod +x bazel && \
+    cp bazel /usr/local/bin/ && \
+    bazel -v
+
+ENV GO111MODULE on
+
+WORKDIR /go/src/github.com/kubeflow/metadata
+
+COPY . .
+
+RUN bazel build -c opt --define=grpc_no_ares=true //... ${EXTRA_BAZEL_ARGS}
+
+RUN cp bazel-bin/server/${OUTPUT_DIR}/server server/server
+
+CMD ["./server/server"]
