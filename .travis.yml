@@ -2,23 +2,35 @@ dist: bionic
 
 env:
   global:
-    - IMAGE_NAME=pkskubeflow/metadata:v1.11
-    - CODE_TAG=master
-
-arch:
-  - arm64
+    - REGISTRY="docker.io"
+    - ORG=pkskubeflow    
+    - REPO=${ORG}/metadata
+    - CODE_TAG=v1.11
+    - IMAGE_TAG=${REGISTRY}/${REPO}:${CODE_TAG}
 
 services:
   - docker
 
 before_install:
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  - sudo add-apt-repository "deb [arch=${TRAVIS_CPU_ARCH}] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce qemu-user-static
+  - wget https://github.com/docker/buildx/releases/download/v0.4.2/buildx-v0.4.2.linux-${TRAVIS_CPU_ARCH}
+  - chmod a+x buildx-v0.4.2.linux-${TRAVIS_CPU_ARCH}
+  - mkdir -p ~/.docker/cli-plugins
+  - mv buildx-v0.4.2.linux-${TRAVIS_CPU_ARCH} ~/.docker/cli-plugins/docker-buildx
+  - docker version
+  - docker buildx version
+  - docker login -u ${DOCKER_USER} -p ${DOCKER_PWD}
+  - if [ "${TRAVIS_CPU_ARCH}" = "amd64" ]; then docker run --rm --privileged multiarch/qemu-user-static --reset -p yes; fi
+  - docker buildx create --use
+  - docker buildx inspect --bootstrap
   - git clone -b ${CODE_TAG} --depth 1 https://github.com/kubeflow/metadata.git
-  - git clone  --depth 1 https://github.com/kubeflow-pk/build-metadata.git
+#  - git clone  --depth 1 https://github.com/kubeflow-pk/build-metadata.git
 
 script:
-  - rm metadata/Dockerfile
-  - cp build-metadata/Dockerfile metadata/
+  - cp Dockerfile.multiarch metadata/Dockerfile
+#  - cp build-metadata/Dockerfile metadata/
   - cd metadata
-  - docker build -t ${IMAGE_NAME} -f Dockerfile .
-  - docker login -u ${DOCKER_USER} -p ${DOCKER_PWD}
-  - docker push ${IMAGE_NAME}
+  - docker buildx build --push --platform linux/amd64 -t ${IMAGE_TAG} -f Dockerfile .
