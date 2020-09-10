@@ -4,13 +4,14 @@ ARG EXTRA_BAZEL_ARGS
 
 RUN apt-get update && apt-get -y install cmake unzip patch wget && apt-get clean
 
-RUN if [ "$(uname -m)" = "aarch64" ]; then export ARCH=arm64; else export ARCH=amd64; fi
+#RUN if [ "$(uname -m)" = "aarch64" ]; then export ARCH=arm64; else export ARCH=amd64; fi
     
-RUN export OUTPUT_DIR=linux_${ARCH}_stripped && \
-    echo ${ARCH} && \
-    echo ${OUTPUT_DIR}
+#RUN export OUTPUT_DIR=linux_${ARCH}_stripped && \
+#    echo ${ARCH} && \
+#    echo ${OUTPUT_DIR}
     
-RUN cd /tmp && \
+RUN if [ "$(uname -m)" = "aarch64" ]; then export ARCH=arm64; else export ARCH=amd64; fi && \
+    cd /tmp && \
     wget -O /tmp/bazel https://github.com/bazelbuild/bazel/releases/download/3.5.0/bazel-3.5.0-linux-${ARCH} && \
     chmod +x bazel && \
     cp bazel /usr/local/bin/ && \
@@ -24,6 +25,7 @@ COPY . .
 
 RUN bazel build -c opt --define=grpc_no_ares=true //... ${EXTRA_BAZEL_ARGS}
 
-RUN cp bazel-bin/server/${OUTPUT_DIR}/server server/server
+RUN if [ "$(uname -m)" = "aarch64" ]; then export ARCH=arm64; else export ARCH=amd64; fi && \
+    cp bazel-bin/server/linux_${ARCH}_stripped/server server/server
 
 CMD ["./server/server"]
