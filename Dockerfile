@@ -11,7 +11,7 @@ ARG BASE_IMG=pkskubeflow/metadata-base
 FROM ${BASE_IMG}
 
 ARG EXTRA_BAZEL_ARGS
-ARG OUTPUT_DIR=linux_amd64_stripped
+ARG OUTPUT_DIR=linux_arm64_stripped
 
 ENV GO111MODULE on
 
@@ -19,7 +19,7 @@ WORKDIR /go/src/github.com/kubeflow/metadata
 
 COPY . .
 
-RUN bazel build -c opt --define=grpc_no_ares=true //... ${EXTRA_BAZEL_ARGS}
+RUN bazel build -c opt --define=grpc_no_ares=true //... --host_javabase=@local_jdk//:jdk
 
 RUN cp bazel-bin/server/${OUTPUT_DIR}/server server/server
 
