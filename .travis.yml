@@ -5,7 +5,7 @@ env:
     - REGISTRY="docker.io"
     - ORG=pkskubeflow    
     - REPO=${ORG}/metadata
-    - CODE_TAG=v1.11
+    - CODE_TAG=master
     - IMAGE_TAG=${REGISTRY}/${REPO}:${CODE_TAG}
 
 services:
